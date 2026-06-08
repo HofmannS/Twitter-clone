@@ -1,7 +1,19 @@
 import { NextResponse } from "next/server";
-import { verifyToken } from "@/src/lib/jwt";
+import { jwtVerify } from "jose";
 
-export function middleware(req) {
+const secret = new TextEncoder().encode(process.env.JWT_SECRET);
+
+async function verifyMiddlewareToken(token) {
+  if (!token) return null;
+  try {
+    const { payload } = await jwtVerify(token, secret);
+    return payload;
+  } catch {
+    return null;
+  }
+}
+
+export async function middleware(req) {
   const token = req.cookies.get("token")?.value;
 
   const isAuthPage =
@@ -13,7 +25,8 @@ export function middleware(req) {
     req.nextUrl.pathname.startsWith("/profile") ||
     req.nextUrl.pathname.startsWith("/settings");
 
-  const isValidToken = !!verifyToken(token);
+  const verifyResult = await verifyMiddlewareToken(token);
+  const isValidToken = !!verifyResult;
 
   if (!isValidToken && isProtectedRoute) {
     return NextResponse.redirect(new URL("/auth/login", req.url));
