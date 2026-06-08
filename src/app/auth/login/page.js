@@ -12,11 +12,7 @@ export default function LoginPage() {
 
   async function handleLogin() {
     try {
-      await axios.post("/api/auth/login", {
-        email,
-        password,
-      });
-
+      await axios.post("/api/auth/login", { email, password });
       router.push("/home");
     } catch (err) {
       alert("Ошибка входа");
