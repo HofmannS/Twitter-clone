@@ -3,6 +3,8 @@
 import { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import Link from "next/link";
+import TextInputWithEmoji from "@/src/components/TextInputWithEmoji";
+import TwemojiText from "@/src/components/TwemojiText";
 
 function HeartIcon({ filled }) {
   return filled ? (
@@ -74,7 +76,10 @@ function PostCard({ post, currentUserId, onDelete, onLike, onComment, onDeleteCo
             )}
           </div>
 
-          <p className="mt-1 text-[15px] leading-relaxed break-words">{post.content}</p>
+          <TwemojiText
+            text={post.content}
+            className="mt-1 text-[15px] leading-relaxed break-words"
+          />
 
           {/* Actions */}
           <div className="flex gap-5 mt-3">
@@ -113,7 +118,7 @@ function PostCard({ post, currentUserId, onDelete, onLike, onComment, onDeleteCo
                         <span className="font-semibold text-yellow-400 mr-1.5">
                           @{c.user?.username}
                         </span>
-                        <span className="text-zinc-300">{c.text}</span>
+                        <TwemojiText text={c.text} className="text-zinc-300" inline />
                       </div>
                       {(currentUserId === c.user?._id?.toString() ||
                         currentUserId === post.user?._id?.toString()) && (
@@ -130,18 +135,18 @@ function PostCard({ post, currentUserId, onDelete, onLike, onComment, onDeleteCo
               )}
 
               {currentUserId && (
-                <div className="flex gap-2 mt-2">
-                  <input
+                <div className="flex gap-2 mt-2 items-center">
+                  <TextInputWithEmoji
+                    className="flex-1"
                     value={commentText}
-                    onChange={(e) => setCommentText(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && submitComment()}
+                    onChange={setCommentText}
                     placeholder="Write a comment..."
-                    className="flex-1 bg-zinc-900 border border-zinc-700 rounded-full px-4 py-1.5 text-sm focus:outline-none focus:border-yellow-400 transition-colors"
+                    onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && submitComment()}
                   />
                   <button
                     onClick={submitComment}
                     disabled={submitting || !commentText.trim()}
-                    className="px-4 py-1.5 bg-yellow-400 text-black text-sm font-bold rounded-full hover:bg-yellow-300 disabled:opacity-40 transition-colors"
+                    className="px-4 py-1.5 bg-yellow-400 text-black text-sm font-bold rounded-full hover:bg-yellow-300 disabled:opacity-40 transition-colors shrink-0"
                   >
                     Reply
                   </button>
@@ -306,22 +311,22 @@ export default function HomePage() {
                 className="w-10 h-10 rounded-full object-cover shrink-0"
               />
               <div className="flex-1">
-                <textarea
-                  className="w-full bg-black outline-none resize-none text-lg placeholder-zinc-600"
-                  placeholder="What's happening?"
+                <TextInputWithEmoji
+                  multiline
                   rows={2}
                   value={content}
-                  onChange={(e) => setContent(e.target.value)}
+                  onChange={setContent}
+                  placeholder="What's happening?"
+                  actions={
+                    <button
+                      onClick={createPost}
+                      disabled={posting || !content.trim()}
+                      className="bg-yellow-400 text-black px-5 py-2 rounded-full font-bold hover:bg-yellow-300 disabled:opacity-50 transition-colors"
+                    >
+                      {posting ? "Posting..." : "Post"}
+                    </button>
+                  }
                 />
-                <div className="flex justify-end mt-2">
-                  <button
-                    onClick={createPost}
-                    disabled={posting || !content.trim()}
-                    className="bg-yellow-400 text-black px-5 py-2 rounded-full font-bold hover:bg-yellow-300 disabled:opacity-50 transition-colors"
-                  >
-                    {posting ? "Posting..." : "Post"}
-                  </button>
-                </div>
               </div>
             </div>
           </div>
