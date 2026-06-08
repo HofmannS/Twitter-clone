@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import TwemojiText from "@/src/components/TwemojiText";
 
 export default function ProfilePage() {
   const params = useParams();
@@ -125,7 +126,7 @@ export default function ProfilePage() {
         ) : (
           posts.map((post) => (
             <div key={post._id} className="p-4">
-              <p className="mt-1">{post.content}</p>
+              <TwemojiText text={post.content} className="mt-1" />
               <div className="flex gap-4 mt-3 text-sm text-zinc-500">
                 <span className="text-yellow-400">♥ {post.likes?.length ?? 0}</span>
                 <span>💬 {post.comments?.length ?? 0}</span>
