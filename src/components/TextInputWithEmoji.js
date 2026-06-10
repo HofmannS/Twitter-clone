@@ -40,10 +40,17 @@ export default function TextInputWithEmoji({
   className = '',
   onKeyDown,
   actions,
+  autoFocus = false,
 }) {
   const [pickerOpen, setPickerOpen] = useState(false);
   const containerRef = useRef(null);
   const inputRef = useRef(null);
+
+  useEffect(() => {
+    if (autoFocus && multiline && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [autoFocus, multiline]);
 
   useEffect(() => {
     if (!pickerOpen) return;
