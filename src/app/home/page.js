@@ -5,6 +5,7 @@ import axios from "axios";
 import Link from "next/link";
 import TextInputWithEmoji from "@/src/components/TextInputWithEmoji";
 import TwemojiText from "@/src/components/TwemojiText";
+import ComposePostModal from "@/src/components/ComposePostModal";
 
 function HeartIcon({ filled }) {
   return filled ? (
@@ -226,7 +227,7 @@ function WhoToFollow({ currentUserId }) {
 export default function HomePage() {
   const [currentUser, setCurrentUser] = useState(null);
   const [posts, setPosts] = useState([]);
-  const [content, setContent] = useState("");
+  const [composeOpen, setComposeOpen] = useState(false);
   const [tab, setTab] = useState("foryou");
   const [posting, setPosting] = useState(false);
 
@@ -249,12 +250,11 @@ export default function HomePage() {
     fetchPosts();
   }, [fetchPosts]);
 
-  async function createPost() {
-    if (!content.trim()) return;
+  async function createPost(text) {
     setPosting(true);
     try {
-      await axios.post("/api/posts", { content });
-      setContent("");
+      await axios.post("/api/posts", { content: text });
+      setComposeOpen(false);
       fetchPosts();
     } finally {
       setPosting(false);
@@ -301,36 +301,26 @@ export default function HomePage() {
     <div className="flex min-h-screen">
       {/* Main feed */}
       <main className="flex-1 border-r border-zinc-800 min-w-0">
-        {/* Compose */}
+        {/* Compose trigger */}
         {currentUser && (
           <div className="p-4 border-b border-zinc-800">
-            <div className="flex gap-3">
-              <img
-                src={currentUser.avatar ?? "/avatars/default_avatar.png"}
-                alt="me"
-                className="w-10 h-10 rounded-full object-cover shrink-0"
-              />
-              <div className="flex-1">
-                <TextInputWithEmoji
-                  multiline
-                  rows={2}
-                  value={content}
-                  onChange={setContent}
-                  placeholder="What's happening?"
-                  actions={
-                    <button
-                      onClick={createPost}
-                      disabled={posting || !content.trim()}
-                      className="bg-yellow-400 text-black px-5 py-2 rounded-full font-bold hover:bg-yellow-300 disabled:opacity-50 transition-colors"
-                    >
-                      {posting ? "Posting..." : "Post"}
-                    </button>
-                  }
-                />
-              </div>
-            </div>
+            <button
+              type="button"
+              onClick={() => setComposeOpen(true)}
+              className="w-full text-left text-lg text-zinc-600 hover:text-zinc-400 py-3 px-4 rounded-full border border-zinc-800 hover:border-zinc-600 transition-colors"
+            >
+              What&apos;s happening?
+            </button>
           </div>
         )}
+
+        <ComposePostModal
+          open={composeOpen}
+          onClose={() => setComposeOpen(false)}
+          user={currentUser}
+          posting={posting}
+          onPost={createPost}
+        />
 
         {/* Tabs */}
         <div className="flex border-b border-zinc-800">
